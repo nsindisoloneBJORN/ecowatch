@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Crew Portal</title>
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <!-- Page-specific custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/crewPortalStyle.css') }}">
+</head>
+<body>
+
+    <header class="portal-header">
+        <h2>EcoWatch</h2>
+        <div>
+            <span>Welcome, <strong>{{ session.get('staff_name', 'Crew Member') }}</strong></span> | 
+            <a href="{{ url_for('logout') }}" class="logout-link">Log Out</a>
+        </div>
+    </header>
+
+    <main class="portal-container">
+        
+        <!-- Flash Message Banner -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert-success">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="dashboard-grid">
+            
+            <!-- Map View of Assigned Tasks -->
+            <div class="card">
+                <h3>Assigned Task Locations Map</h3>
+                
+                <!-- Location Locking Controls -->
+                <div style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                    <button id="lockLocationBtn" type="button" class="btn-action" style="display: none; background-color: #28a745; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;">Lock My Location</button>
+                    <span id="lockStatus" style="font-weight: bold; color: green; font-size: 14px;"></span>
+                </div>
+
+                <div id="crewMap"></div>
+            </div>
+
+            <!-- Table of Assigned Tasks + Status Updates -->
+            <div class="card">
+                <h3>Your Active Assigned Tasks</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Issue Type</th>
+                                <th>Location Address</th>
+                                <th>Current Status</th>
+                                <th>Update Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in assigned_tasks %}
+                            <tr>
+                                <td style="font-weight: bold;">{{ task.report_id }}</td>
+                                <td>{{ task.issue_type }}</td>
+                                <td>{{ task.location }}</td>
+                                <td>
+                                    <span class="status-badge {% if task.status == 'Resolved' %}badge-resolved{% else %}badge-assigned{% endif %}">
+                                        {{ task.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('update_crew_status', report_id=task.report_id) }}" method="POST" class="status-form">
+                                        <select name="status" class="role-select">
+                                            <option value="Assigned" {% if task.status == 'Assigned' %}selected{% endif %}>Assigned</option>
+                                            <option value="In Progress" {% if task.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                        </select>
+                                        <button type="submit" class="btn-save">Save</button>
+                                    </form>
+                                </td>
+                                <td style="text-align: right;">
+                                    {% if task.status == 'Resolved' %}
+                                        <span class="proof-submitted-text">
+                                            ✓ Proof Submitted
+                                        </span>
+                                    {% else %}
+                                        <button class="btn-action" onclick="openProofModal('{{ task.report_id }}')">Upload Proof</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Completion Proof Modal -->
+    <div class="modal-overlay" id="proofModal" style="display: none !important;">
+        <div class="modal-content">
+            <h3>Submit Completion Proof</h3>
+            <p class="modal-subtitle">Upload a photo taken at the site to resolve this task.</p>
+            
+            <form id="proofForm" action="{{ url_for('resolve_task') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="modalReportId" name="report_id">
+                
+                <div class="form-group">
+                    <label for="completion_photo">Select Site Photo:</label>
+                    <input type="file" id="completion_photo" name="completion_photo" accept="image/*" onchange="handlePhotoSelection(event)">
+                </div>
+
+                <!-- GPS Validation Feedback Box -->
+                <div id="gpsFeedback" class="gps-feedback"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeProofModal()">Cancel</button>
+                    <button type="submit" class="btn-action" id="submitProofBtn">Submit & Resolve Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine JS -->
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    
+    <!-- Safely pass assigned tasks via script JSON element -->
+    <script id="tasks-data" type="application/json">{{ assigned_tasks | tojson | safe }}</script>
+    <!-- Page-specific custom script -->
+    <script src="{{ url_for('static', filename='js/crewPortalScript.js') }}"></script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

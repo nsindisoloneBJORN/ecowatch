@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - My Reports Status</title>
+    <!-- Use unified resident/admin stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/residentStyle.css') }}">
+</head>
+<body>
+
+    <header class="portal-header">
+        <div class="header-left">
+            <!-- Hamburger Menu Button (Matches Admin Style) -->
+            <button type="button" class="hamburger-btn" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Dropdown Navigation Menu -->
+            <div class="admin-dropdown-menu" id="adminDropdown">
+                <a href="/resident" class="{% if request.path == '/resident' %}active-page{% endif %}">Reporting Waste</a>
+                <a href="/myReports" class="{% if request.path == '/myReports' %}active-page{% endif %}">Reports Status</a>
+                <a href="/logout" class="btn-logout-link">Logout</a>
+            </div>
+            
+            <a href="/resident" class="logo">EcoWatch</a>
+        </div>
+
+        <div class="header-right">
+            <span>Welcome, <strong>{{ session.get('user_name', 'Resident') }}</strong></span>
+        </div>
+    </header>
+
+    <div class="portal-container">
+        <div style="margin-bottom: 20px;">
+            <a href="/resident" class="btn-back">Back</a>
+        </div>
+
+        <div class="table-section">
+            <div class="section-header">
+                <h3>My Submitted Reports & Status</h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Report ID</th>
+                            <th>Issue Type</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Photo</th>
+                            <th>Status</th>
+                            <th>Date Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td><strong>{{ report.report_id }}</strong></td>
+                            <td>{{ report.issue_type | title }}</td>
+                            <td>{{ report.location }}</td>
+                            <td>{{ report.description }}</td>
+                            <td>
+                                {% if report.photo and report.photo != 'default.jpg' %}
+                                    <a href="{{ url_for('static', filename='uploads/' + report.photo) }}" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none;">View Photo</a>
+                                {% else %}
+                                    <span style="color: #888;">No Photo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if report.status == 'Pending Review' %}pending-review
+                                    {% elif report.status in ['Crew Assigned', 'Assigned', 'In Progress'] %}in-progress
+                                    {% elif report.status == 'Resolved' %}resolved
+                                    {% elif report.status == 'Rejected' %}rejected
+                                    {% endif %}">
+                                    {{ report.status }}
+                                </span>
+                            </td>
+                            <td>{{ report.created_at }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #777; padding: 30px;">You haven't submitted any waste reports yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropdown Menu Script -->
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById('adminDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.header-left')) {
+                const dropdown = document.getElementById('adminDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        }
+    </script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

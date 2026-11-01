@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Admin Portal</title>
+    <!-- Page-specific custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/adminMainStyle.css') }}">
+</head>
+<body>
+
+    <!-- Header & Dynamic Menu Bar -->
+    <header class="portal-header">
+        <div class="header-left">
+            <button class="hamburger-btn" id="menuToggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2>EcoWatch</h2>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- Notification Bell Icon / Counter -->
+            <div style="position: relative; display: inline-block;">
+                <a href="#" id="admin-bell-icon" style="color: #333; text-decoration: none; font-size: 15px; font-weight: bold; background: #e0e0e0; padding: 6px 12px; border-radius: 4px;">
+                    Alerts <span id="admin-notif-badge" class="badge" style="display: none; background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; vertical-align: top;">0</span>
+                </a>
+            </div>
+            <span id="welcome-user" style="color: #000000; font-weight: bold;">Welcome, {{ staff_name }}</span>
+        </div>
+
+        <!-- Dropdown Navigation Box -->
+        <div class="admin-dropdown-menu" id="adminDropdown">
+            <a href="{{ url_for('adminPortal') }}" class="menu-tab-btn active-page">Manage Incidents</a>
+            <a href="{{ url_for('adminUsers') }}" class="menu-tab-btn">User Accounts</a>
+            <a href="{{ url_for('adminAnalytics') }}" class="menu-tab-btn">Analytics & Reports</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout-link">Log Out</a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="portal-container">
+        <section class="table-section">
+            <div class="section-header">
+                <h3>Manage Community Incident Reports</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Report ID</th>
+                            <th>Issue Type</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Date & Time Log</th>
+                            <th>Resident Photo</th>
+                            <th>Completion Proof</th>
+                            <th style="text-align: right;">Assign & Dispatch Crew</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        {% for report in reports %}
+        <tr>
+            <!-- 1. Report ID -->
+            <td style="font-weight: bold;">#REP-{{ "%04d" | format(report.id) }}</td>
+
+            <!-- 2. Issue Type -->
+            <td>{{ report.issue_type | upper if report.issue_type else 'N/A' }}</td>
+
+            <!-- 3. Location & Track Route Action -->
+            <td>
+                {{ report.location }}
+                {% if report.status in ['Crew Assigned', 'In Progress'] %}
+                    <br>
+                    <a href="{{ url_for('track_crew', report_id=report.id) }}" style="display: inline-block; margin-top: 6px; padding: 4px 10px; background-color: #2e7d32; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        Track Route
+                    </a>
+                {% endif %}
+            </td>
+
+            <!-- 4. Description -->
+            <td>{{ report.description if report.description else 'none provided' }}</td>
+
+            <!-- 5. Status -->
+            <td>
+                <span class="status-badge {{ report.status | lower | replace(' ', '-') }}">
+                    {{ report.status }}
+                </span>
+            </td>
+
+            <!-- 6. Date & Time Log -->
+            <td>
+                <div style="font-size: 11px; line-height: 1.3;">
+                    <strong>Made:</strong> {{ report.created_at.strftime('%Y-%m-%d %H:%M') if report.created_at else 'N/A' }}<br>
+                    <strong>Assigned:</strong> {{ report.assigned_at.strftime('%Y-%m-%d %H:%M') if report.assigned_at else 'Pending' }}<br>
+                    <strong>Resolved:</strong> {{ report.resolved_at.strftime('%Y-%m-%d %H:%M') if report.resolved_at else 'Pending' }}
+                </div>
+            </td>
+
+            <!-- 7. Resident Photo & Actions -->
+            <td>
+                {% if report.photo and report.photo != 'default.jpg' %}
+                    <a href="{{ url_for('static', filename='uploads/' + report.photo) }}" target="_blank" style="display: inline-block; padding: 5px 10px; background: #2980b9; color: #fff; border-radius: 4px; text-decoration: none; font-size: 12px; margin-bottom: 6px;">View Photo</a>
+                {% else %}
+                    <span style="color: #888; font-size: 12px; display: block; margin-bottom: 6px;">No Photo</span>
+                {% endif %}
+
+                {% if report.status != 'Rejected' and report.status != 'Resolved' and not report.assigned_crew %}
+                    <form action="{{ url_for('reject_report', report_id=report.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to reject this report as non-waste related?');" style="margin: 0; display: inline-block;">
+                        <button type="submit" style="padding: 5px 10px; background: #e74c3c; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Reject</button>
+                    </form>
+                {% endif %}
+            </td>
+
+            <!-- 8. Completion Proof -->
+            <td>
+                {% if report.status == 'Resolved' and report.completion_photo %}
+                    <a href="{{ url_for('static', filename='uploads/' + report.completion_photo) }}" target="_blank" style="display: inline-block; padding: 5px 10px; background-color: #27ae60; color: #fff; border-radius: 4px; text-decoration: none; font-size: 12px;">View Proof</a>
+                {% elif report.status == 'Resolved' %}
+                    <span style="color: #888; font-size: 12px;">Resolved (No Proof)</span>
+                {% else %}
+                    <span style="color: #888; font-size: 12px;">Pending Resolution</span>
+                {% endif %}
+            </td>
+
+            <!-- 9. Assign & Dispatch Crew -->
+            <td style="text-align: right;">
+                {% if report.status == 'Rejected' %}
+                    <span style="color: #c0392b; font-weight: 600; font-size: 13px;">✕ Rejected</span>
+                {% elif report.assigned_crew %}
+                    <span style="color: #2e7d32; font-weight: 600; font-size: 13px;">
+                        ✓ Assigned to: {{ report.assigned_crew }}
+                    </span>
+                {% else %}
+                    <form action="{{ url_for('assign_crew', report_id=report.id) }}" method="POST" class="assign-form">
+                        <select name="crew_member" required>
+                            <option value="" disabled selected>Select Available Crew</option>
+                            {% for crew in crews %}
+                                {% set crew_full_name = crew.name ~ ' ' ~ crew.surname %}
+                                {% if crew.is_available %}
+                                    <option value="{{ crew_full_name }}">{{ crew_full_name }} (Available)</option>
+                                {% else %}
+                                    <option value="{{ crew_full_name }}" disabled style="color: #999; background-color: #f1f1f1;">{{ crew_full_name }} (Unavailable / Busy)</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-dispatch">Assign and Dispatch</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="9" style="text-align: center; color: #777; padding: 30px;">No incident reports found in the system.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Page-specific custom script -->
+    <script src="{{ url_for('static', filename='js/adminPortalScript.js') }}"></script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

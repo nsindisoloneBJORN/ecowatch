@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - User Accounts & Roles</title>
+    <!-- Page-specific custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/adminMainStyle.css') }}">
+    
+    <!-- Direct Inline Styling Fix for Add User Button -->
+    <style>
+        .section-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 20px !important;
+        }
+        .btn-add-user {
+            display: inline-block !important;
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            color: #2e7d32 !important;
+            background-color: #ffffff !important;
+            border: 2px solid #2e7d32 !important;
+            border-radius: 6px !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+        }
+        .btn-add-user:hover {
+            background-color: #f1f8f5 !important;
+        }
+        .btn-add-user:active {
+            transform: scale(0.95) !important;
+            background-color: #e8f5e9 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="portal-header">
+        <div class="header-left">
+            <button class="hamburger-btn" id="menuToggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2>EcoWatch</h2>
+        </div>
+        <div class="header-right">
+            <span id="welcome-user" style="color: #27ae60; font-weight: bold;">Welcome, {{ staff_name }}</span>
+        </div>
+
+        <div class="admin-dropdown-menu" id="adminDropdown">
+            <a href="{{ url_for('adminPortal') }}" class="menu-tab-btn">Manage Incidents</a>
+            <a href="{{ url_for('adminUsers') }}" class="menu-tab-btn active-page">User Accounts</a>
+            <a href="{{ url_for('adminAnalytics') }}" class="menu-tab-btn">Analytics & Reports</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout-link">Log Out</a>
+        </div>
+    </header>
+
+    <main class="portal-container">
+        <section class="table-section">
+            <div class="section-header">
+                <h3 style="margin: 0; color: #27ae60;">System User Accounts & Role Management</h3>
+                <a href="{{ url_for('add_user_page') }}" class="btn-add-user">Add User</a>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name / Username</th>
+                            <th>Email Address</th>
+                            <th>System Role</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td style="font-weight: bold;">#{{ user.staff_id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email if user.email else 'No email provided' }}</td>
+                            <td>
+                                <form action="{{ url_for('update_role', staff_id=user.staff_id) }}" method="POST" style="margin:0;">
+                                    <select name="role" class="role-select" onchange="this.form.submit()">
+                                        <option value="Administrator" {% if user.role == 'Administrator' %}selected{% endif %}>Administrator</option>
+                                        <option value="Cleanup Crew" {% if user.role == 'Cleanup Crew' %}selected{% endif %}>Cleanup Crew</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td style="text-align: right;">
+                                <form action="{{ url_for('delete_user', staff_id=user.staff_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');" style="margin:0; display:inline-block;">
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #6c757d; padding: 20px;">No staff accounts registered in the database.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Page-specific custom script -->
+    <script src="{{ url_for('static', filename='js/adminUsersScript.js') }}"></script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

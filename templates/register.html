@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Register</title>
+    <!-- Linked external stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/indexStyle.css') }}">
+    <!-- FontAwesome for eye icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header>
+        <div class="logo-container">
+            <a href="/" class="logo">EcoWatch</a>
+            <span class="logo-sub">Community & Municipal Waste Management</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/">Report Waste</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a class="login-nav-btn" href="/">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="login-form-box" style="margin: 40px auto; max-width: 450px;">
+            <h2>Create Account</h2>
+            <div class="login-subtitle">Sign up for your EcoWatch Resident account</div>
+            
+            <!-- Registration Form with Password Match Validation Hook -->
+            <form id="registerForm" action="/register" method="POST" onsubmit="return validatePasswordMatch()" autocomplete="off">
+                
+                <div class="form-group">
+    <label for="firstname">First Name</label>
+    <input type="text" id="firstname" name="name" placeholder="Enter Your First Name" required>
+</div>
+
+<div class="form-group">
+    <label for="surname">Surname</label>
+    <input type="text" id="surname" name="surname" placeholder="Enter Your Surname" required>
+</div>
+
+<div class="form-group">
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="Enter Your Email" required>
+</div>
+
+<div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" name="phone" placeholder="Enter Your Phone Number (e.g., 078...)" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" required>
+</div>
+
+                <!-- Password Field with Toggle -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper" style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="password" name="password" placeholder="Enter Password" required style="width: 100%; padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="togglePassword" onclick="togglePasswordVisibility('password', 'togglePassword')" style="position: absolute; right: 12px; cursor: pointer; color: #666;"></i>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field with Toggle -->
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="password-wrapper" style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter Password to confirm" required style="width: 100%; padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')" style="position: absolute; right: 12px; cursor: pointer; color: #666;"></i>
+                    </div>
+                    <small id="passwordError" style="color: red; display: none; margin-top: 4px;">Passwords do not match!</small>
+                </div>
+
+                <button type="submit" class="btn-action btn-green" style="width: 100%; margin-top: 10px;">Register Account</button>
+            </form>
+
+            <div class="switch-text" style="text-align: center; margin-top: 15px;">
+                Already have an account? <a href="/">Login here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linked external JavaScript file -->
+    <script src="{{ url_for('static', filename='js/registerScript.js') }}"></script>
+</body>
+</html>

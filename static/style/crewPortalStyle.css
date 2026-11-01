@@ -1,0 +1,261 @@
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    background-color: #f4f6f9; 
+    color: #333; 
+}
+
+.portal-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 25px; 
+    background: #ffffff; 
+    border-bottom: 2px solid #e1e4e8; 
+}
+
+.portal-header h2 { 
+    color: #27ae60; 
+    margin: 0; 
+}
+
+.logout-link {
+    color: #e74c3c; 
+    text-decoration: none; 
+    font-weight: bold;
+}
+
+.portal-container { 
+    padding: 25px; 
+    max-width: 1300px; 
+    margin: 0 auto; 
+}
+
+/* Flash Messages */
+.flash-messages { 
+    margin-bottom: 20px; 
+}
+
+.alert-success { 
+    background: #e8f8f5; 
+    color: #27ae60; 
+    padding: 12px 15px; 
+    border-radius: 6px; 
+    border: 1px solid #a3e4d7; 
+    font-weight: bold; 
+}
+
+/* Layout Grid for Map and Table */
+.dashboard-grid { 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 25px; 
+}
+
+.card { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+}
+
+.card h3 { 
+    margin-top: 0; 
+    color: #27ae60; 
+    border-bottom: 2px solid #f0f2f5; 
+    padding-bottom: 10px; 
+}
+
+/* Map Container */
+#crewMap { 
+    width: 100%; 
+    height: 350px; 
+    border-radius: 6px; 
+    z-index: 1; 
+}
+
+/* Fullscreen Map Toggle Styles */
+#crewMap.fullscreen-mode {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 999999 !important;
+    border-radius: 0 !important;
+}
+
+/* Table Styles */
+.table-responsive { 
+    width: 100%; 
+    overflow-x: auto; 
+}
+
+.data-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 10px; 
+    text-align: left; 
+}
+
+.data-table th, .data-table td { 
+    padding: 14px 16px; 
+    border-bottom: 1px solid #e1e4e8; 
+    font-size: 14px; 
+    vertical-align: middle; 
+}
+
+.data-table th { 
+    background-color: #f8f9fa; 
+    color: #27ae60; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    font-size: 12px; 
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.badge-assigned { 
+    background: #f39c12; 
+    color: white; 
+}
+
+.badge-resolved { 
+    background: #27ae60; 
+    color: white; 
+}
+
+.status-form {
+    margin: 0; 
+    display: inline-flex; 
+    gap: 5px;
+}
+
+.role-select {
+    padding: 4px; 
+    border-radius: 4px;
+}
+
+.btn-save {
+    background: #27ae60; 
+    color: white; 
+    border: none; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 11px;
+}
+
+.proof-submitted-text {
+    color: #2e7d32; 
+    font-weight: 600; 
+    font-size: 13px;
+}
+
+.btn-action { 
+    background-color: #27ae60; 
+    color: white; 
+    border: none; 
+    padding: 6px 12px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 13px; 
+}
+
+.btn-action:hover { 
+    background-color: #219653; 
+}
+
+/* Modal Overlay for Proof Submission (Strictly Hidden by Default) */
+.modal-overlay { 
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.5); 
+    z-index: 2000; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.modal-overlay.active { 
+    display: flex; 
+}
+
+.modal-content { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 8px; 
+    width: 450px; 
+    max-width: 90%; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+}
+
+.modal-content h3 { 
+    margin-top: 0; 
+    color: #27ae60; 
+}
+
+.modal-subtitle {
+    font-size: 13px; 
+    color: #666;
+}
+
+.form-group { 
+    margin-bottom: 15px; 
+}
+
+.form-group label { 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    font-size: 13px; 
+}
+
+.form-group input[type="file"] { 
+    width: 100%; 
+    padding: 8px; 
+    border: 1px dashed #ccc; 
+    border-radius: 4px; 
+    background: #fafafa; 
+}
+
+/* GPS Validation Feedback Box */
+.gps-feedback { 
+    font-size: 13px; 
+    padding: 10px; 
+    border-radius: 4px; 
+    margin-bottom: 15px; 
+    display: none; 
+}
+
+.gps-feedback.success { 
+    background: #e8f8f5; 
+    color: #27ae60; 
+    border: 1px solid #a3e4d7; 
+}
+
+.modal-actions { 
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 10px; 
+}
+
+.btn-secondary { 
+    background: #6c757d; 
+    color: white; 
+    border: none; 
+    padding: 8px 14px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+
+#submitProofBtn { 
+    display: none; 
+}

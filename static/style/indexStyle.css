@@ -1,0 +1,268 @@
+:root {
+    --primary: #2e7d32;
+    --primary-hover: #1b5e20;
+    --white: #ffffff;
+    --dark: #333333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allows natural scrolling when screen height is short or rotated */
+    background-color: #f4f6f5;
+}
+
+/* Header & Navigation */
+header {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 12px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+    position: sticky;
+    top: 0;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+    line-height: 1.1;
+}
+
+.logo-sub {
+    font-size: 11px;
+    color: #666;
+    font-weight: 600;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 15px;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+nav ul li a:hover {
+    color: var(--primary);
+}
+
+.login-nav-btn {
+    background-color: var(--primary);
+    color: var(--white) !important;
+    padding: 8px 18px;
+    border-radius: 4px;
+    transition: background 0.3s;
+    white-space: nowrap; /* Prevents "Log In" from splitting into two lines */
+}
+
+.login-nav-btn:hover {
+    background-color: var(--primary-hover) !important;
+}
+
+/* Main Wrapper */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: calc(100vh - 65px);
+}
+
+/* 1. HOME VIEW */
+#home-hero {
+    position: relative; 
+    width: 100%; 
+    min-height: calc(100vh - 65px);
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('../bg.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vw 8vw; /* Fluid padding based on screen width */
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.digital-tag {
+    color: #a5d6a7;
+    text-transform: uppercase;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+}
+
+.hero-title {
+    color: var(--white);
+    font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    line-height: 1.2;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.hero-desc {
+    color: #e0e0e0;
+    font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+    line-height: 1.5;
+    margin-bottom: 25px;
+    max-width: 650px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* 2. LOGIN VIEW */
+#login-split-container {
+    position: relative; 
+    width: 100%; 
+    min-height: calc(100vh - 65px);
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('../bg.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px; /* Generous padding ensures form never touches edges and allows scrolling */
+    box-sizing: border-box;
+    z-index: 3;
+}
+
+.login-form-box {
+    background: white; 
+    padding: 40px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+    max-width: 400px; 
+    width: 100%; 
+    box-sizing: border-box;
+    margin: auto;
+}
+
+.login-form-box h2 {
+    color: var(--dark);
+    margin-bottom: 5px;
+    font-size: 26px;
+}
+
+.login-subtitle {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+/* Common Form Styles */
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #444;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 4px rgba(46, 125, 50, 0.2);
+}
+
+.btn-action {
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-green {
+    background-color: var(--primary);
+    color: var(--white);
+    width: 100%;
+}
+.btn-green:hover { background-color: var(--primary-hover); }
+
+.switch-text { 
+    text-align: center; 
+    margin-top: 20px; 
+    font-size: 14px; 
+}
+.switch-text a { 
+    color: var(--primary); 
+    text-decoration: none; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
+.hidden { display: none !important; }
+
+/* Responsive Media Query for Mobile Viewports */
+@media (max-width: 600px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo-sub {
+        font-size: 9px;
+    }
+
+    nav ul {
+        gap: 12px;
+    }
+
+    nav ul li a {
+        font-size: 13px;
+    }
+
+    .login-nav-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}

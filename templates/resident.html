@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Resident Dashboard</title>
+    <!-- Page-specific custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/residentStyle.css') }}">
+    <style>
+        .photo-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .btn-photo-opt {
+            flex: 1;
+            padding: 10px 14px;
+            background-color: #f0f2f5;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-photo-opt:hover {
+            background-color: #e4e6eb;
+            border-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="portal-header">
+        <div class="header-left">
+            <!-- Hamburger Menu Button (Matches Admin Style) -->
+            <button type="button" class="hamburger-btn" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Dropdown Navigation Menu -->
+            <div class="admin-dropdown-menu" id="adminDropdown">
+                <a href="/resident" class="{% if request.path == '/resident' %}active-page{% endif %}">Reporting Waste</a>
+                <a href="/myReports" class="{% if request.path == '/myReports' %}active-page{% endif %}">Reports Status</a>
+                <a href="/logout" class="btn-logout-link">Logout</a>
+            </div>
+            
+            <a href="/resident" class="logo">EcoWatch</a>
+        </div>
+
+        <div class="header-right">
+            <span>Welcome, <strong>{{ session.get('user_name', 'Resident') }}</strong></span>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <h2>Report Waste Issue</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Capture or attach a photo within KwaDlangezwa.</p>
+            
+            <form id="report-form" action="{{ url_for('submit_report') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="skip-location">Area Name/ Location<span style="color: red;">*</span></label>
+                    <select id="skip-location" name="location" required>
+                        <option value="" disabled selected>Select Location</option>
+                        <option value="skip-1">Mall</option>
+                        <option value="skip-2">Surgery</option>
+                        <option value="skip-3">Mgwazeni</option>
+                        <option value="skip-4">UniZulu Main Campus</option>
+                        <option value="skip-5">Mhlathuze</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-group">
+    <label for="issue-type">Issue Type<span style="color: red;">*</span></label>
+    <select id="issue-type" name="issue_type" required onchange="handleIssueTypeChange(this)">
+        <option value="" disabled selected>Select issue type</option>
+        <option value="overflow">Skip Overflowing</option>
+        <option value="illegal">Illegal Dumping Site</option>
+        <option value="other">Other</option>
+    </select>
+</div>
+
+<!-- Dynamic Custom Issue Type Input (Hidden by default) -->
+<div class="form-group" id="custom-issue-group" style="display: none;">
+    <label for="custom-issue-text">Specify Custom Issue Type <span style="color: red;">*</span></label>
+    <input type="text" id="custom-issue-text" name="custom_issue_type" placeholder="Type the issue description here...">
+</div>
+
+                <div class="form-group">
+                    <label>Waste Photo <span style="color: red;">*</span></label>
+                    
+                    <!-- Hidden input for file selection/upload -->
+                    <input type="file" id="waste-photo" name="waste_photo" accept="image/*" required style="display: none;" onchange="handlePhotoUpload(event)">
+                    
+                    <!-- Hidden input explicitly for live camera capture -->
+                    <input type="file" id="camera-photo" accept="image/*" capture="environment" style="display: none;" onchange="handleCameraUpload(event)">
+
+                    <!-- Action buttons -->
+                    <div class="photo-options">
+                        <button type="button" class="btn-photo-opt" onclick="document.getElementById('waste-photo').click()">
+                             Choose from Gallery
+                        </button>
+                        <button type="button" class="btn-photo-opt" onclick="document.getElementById('camera-photo').click()">
+                             Take Photo
+                        </button>
+                    </div>
+
+                    <div id="file-chosen-name" style="font-size: 12px; color: #555; margin-top: 6px;">No photo selected</div>
+                    <div id="geo-status" class="geo-status"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Additional Details(optional)</label>
+                    <textarea id="description" name="description" placeholder="Describe the issue in detail"></textarea>
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+
+                <button type="submit" class="btn-submit">Submit Report</button>
+            </form>
+        </div>
+
+        <!-- Map Panel (Below Form) -->
+        <div class="map-panel">
+            <h3>City of uMhlathuze Satellite Incident Map</h3>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet CSS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet JS CDN -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- EXIF.js CDN for reading photo geotags -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+
+    <!-- External Custom Script -->
+    <script src="{{ url_for('static', filename='js/residentScript.js') }}"></script>
+
+    <!-- Dropdown Menu Script -->
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById('adminDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.header-left')) {
+                const dropdown = document.getElementById('adminDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        }
+    </script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

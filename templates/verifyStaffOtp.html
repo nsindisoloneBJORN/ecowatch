@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Staff OTP Verification</title>
+    <!-- Page-specific CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/verifyStaffOtpStyle.css') }}">
+</head>
+<body>
+
+    <main class="otp-container">
+        <div class="otp-card">
+            <h2>Staff Account Verification</h2>
+            <p class="otp-description">
+                Please enter the 6-digit OTP code sent to your registered personal email address to activate your municipal staff account.
+            </p>
+
+            <!-- Flash Message Banner -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- OTP Submission Form -->
+            <form action="{{ url_for('verify_staff_otp') }}" method="POST" id="otpForm">
+                <div class="form-group">
+                    <label for="otp">Enter 6-Digit OTP Code</label>
+                    <input 
+                        type="text" 
+                        id="otp" 
+                        name="otp" 
+                        required 
+                        maxlength="6" 
+                        placeholder="123456" 
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">Verify Account</button>
+            </form>
+
+            <!-- Resend Form -->
+            <form action="{{ url_for('resend_staff_otp') }}" method="POST" class="resend-form">
+                <p>Didn't receive the code? 
+                    <button type="submit" class="btn-link">Resend OTP</button>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <!-- Page-specific JS -->
+    <script src="{{ url_for('static', filename='js/verifyStaffOtpScript.js') }}"></script>
+</body>
+</html>

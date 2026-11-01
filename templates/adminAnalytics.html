@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Admin Analytics</title>
+    <!-- Custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/adminMainStyle.css') }}">
+    <!-- Chart.js CDN for interactive visual graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @media print {
+            .hamburger-btn, .admin-dropdown-menu, .export-btn-group, .btn-logout-link { display: none !important; }
+            body { background: #fff !important; }
+            .portal-container { padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Dynamic Menu Bar -->
+    <header class="portal-header">
+        <div class="header-left">
+            <button class="hamburger-btn" id="menuToggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2>EcoWatch</h2>
+        </div>
+        <div>
+            <span id="welcome-user" style="color: #000000; font-weight: bold;">Welcome, {{ staff_name }}</span>
+        </div>
+
+        <!-- Dropdown Navigation Box -->
+        <div class="admin-dropdown-menu" id="adminDropdown">
+            <a href="{{ url_for('adminPortal') }}" class="menu-tab-btn">Manage Incidents</a>
+            <a href="{{ url_for('adminUsers') }}" class="menu-tab-btn">User Accounts</a>
+            <a href="{{ url_for('adminAnalytics') }}" class="menu-tab-btn active">Analytics & Reports</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout-link">Log Out</a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="portal-container">
+        
+        <!-- Section Header & Export Actions -->
+        <section class="table-section">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h3>Operational Performance & Municipal Analytics</h3>
+                <div class="export-btn-group" style="display: flex; gap: 10px;">
+                    <a href="{{ url_for('exportAnalyticsCSV') }}" style="background: #27ae60; color: #fff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">Export CSV (Excel)</a>
+                    <button onclick="window.print()" style="background: #2980b9; color: #fff; padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Print Executive PDF</button>
+                </div>
+            </div>
+            
+            <!-- Quick Metrics Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                
+                <!-- Total Reports Logged -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #27ae60;">
+                    <p style="margin: 0; color: #777; font-size: 12px; font-weight: 600;">TOTAL REPORTS LOGGED</p>
+                    <h2 style="margin: 8px 0 0 0; color: #333; font-size: 28px;">{{ total_reports | default(0) }}</h2>
+                </div>
+
+                <!-- Rejected Reports -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #c0392b;">
+                    <p style="margin: 0; color: #777; font-size: 12px; font-weight: 600;">REJECTED REPORTS</p>
+                    <h2 style="margin: 8px 0 0 0; color: #333; font-size: 28px;">{{ rejected_reports | default(0) }}</h2>
+                </div>
+
+                <!-- Active Crews Dispatched -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #2980b9;">
+                    <p style="margin: 0; color: #777; font-size: 12px; font-weight: 600;">ACTIVE CREWS DISPATCHED</p>
+                    <h2 style="margin: 8px 0 0 0; color: #333; font-size: 28px;">{{ active_crews | default(0) }}</h2>
+                </div>
+
+                <!-- Pending Resolution -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #f39c12;">
+                    <p style="margin: 0; color: #777; font-size: 12px; font-weight: 600;">PENDING RESOLUTION</p>
+                    <h2 style="margin: 8px 0 0 0; color: #333; font-size: 28px;">{{ pending_resolution | default(0) }}</h2>
+                </div>
+
+                <!-- Municipal Resolution Rate -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #8e44ad;">
+                    <p style="margin: 0; color: #777; font-size: 12px; font-weight: 600;">RESOLUTION EFFICIENCY</p>
+                    <h2 style="margin: 8px 0 0 0; color: #333; font-size: 28px;">{{ resolution_rate | default(0) }}%</h2>
+                </div>
+
+            </div>
+
+            <!-- Visual Charts Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 40px;">
+                
+                <!-- Status Distribution Doughnut Chart -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <h4 style="margin-top: 0; color: #444;">Incident Status Distribution</h4>
+                    <div style="max-width: 300px; margin: 0 auto;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hotspot Incident Volume Bar Chart -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <h4 style="margin-top: 0; color: #444;">Hotspot Volume by Location</h4>
+                    <canvas id="hotspotChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Detailed Hotspot Table -->
+            <div class="section-header">
+                <h3>Hotspot Zone Summary (KwaDlangezwa Area)</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Zone Location / Skip ID</th>
+                            <th>Incident Category</th>
+                            <th>Total Incidents Recorded</th>
+                            <th>Avg Turnaround Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if hotspots %}
+                            {% for hotspot in hotspots %}
+                            <tr>
+                                <!-- Uses full location in the table for precise records -->
+                                <td>{{ hotspot.full_location }}</td>
+                                <td>{{ hotspot.incident_category }}</td>
+                                <td>{{ hotspot.total_incidents }}</td>
+                                <td>{{ "%.1f" | format(hotspot.avg_hours) }} Hours</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #777; padding: 20px;">No hotspot data recorded yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Hidden JSON Container for Linter-Safe Data Injection -->
+    <div id="analytics-data" 
+         data-status='{{ status_counts | tojson | safe }}' 
+         data-hotspots='{{ hotspots | tojson | safe }}' 
+         style="display: none;">
+    </div>
+
+    <!-- Custom Chart Initializers -->
+    <script>
+        // Extract parsed JSON safely from DOM attributes
+        const dataElem = document.getElementById('analytics-data');
+        const statusCounts = JSON.parse(dataElem.getAttribute('data-status') || '{}');
+        const hotspotsData = JSON.parse(dataElem.getAttribute('data-hotspots') || '[]');
+
+        // 1. Render Incident Status Doughnut Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending Review', 'Crew Assigned', 'In Progress', 'Resolved', 'Rejected'],
+                datasets: [{
+                    data: [
+                        statusCounts['Pending Review'] || 0,
+                        (statusCounts['Crew Assigned'] || 0) + (statusCounts['Assigned'] || 0),
+                        statusCounts['In Progress'] || 0,
+                        statusCounts['Resolved'] || 0,
+                        statusCounts['Rejected'] || 0
+                    ],
+                    backgroundColor: ['#f39c12', '#2980b9', '#3498db', '#27ae60', '#c0392b']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 2. Render Hotspot Volume Bar Chart
+        const hotspotCtx = document.getElementById('hotspotChart').getContext('2d');
+        const hotspotLabels = hotspotsData.map(h => h.zone_location);
+        const hotspotValues = hotspotsData.map(h => h.total_incidents);
+
+        new Chart(hotspotCtx, {
+            type: 'bar',
+            data: {
+                labels: hotspotLabels.length ? hotspotLabels : ['skip-1', 'skip-2', 'skip-3'],
+                datasets: [{
+                    label: 'Incidents Logged',
+                    data: hotspotValues.length ? hotspotValues : [0, 0, 0],
+                    backgroundColor: '#27ae60',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+
+    <!-- Page-specific custom script -->
+    <script src="{{ url_for('static', filename='js/adminPortalScript.js') }}"></script>
+
+    <!-- Centralized Logout Modal Script -->
+    <script src="{{ url_for('static', filename='js/logoutModal.js') }}"></script>
+</body>
+</html>

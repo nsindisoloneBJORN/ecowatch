@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch Admin - Add New User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/adminMainStyle.css') }}">
+</head>
+<body>
+
+    <header class="portal-header">
+        <h2>EcoWatch</h2>
+        <div class="nav-links">
+           <a href="{{ url_for('adminUsers') }}" class="btn-back">Back</a>
+        </div>
+    </header>
+
+    <!-- Form container dynamically gets blurred if duplicate_error is True -->
+    <div class="form-container {% if duplicate_error %}is-blurred{% endif %}">
+        <h2 style="color: #2e7d32; margin-top: 0;">Register New System User</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Fill in the profile details below.</p>
+
+        <form action="{{ url_for('create_user') }}" method="POST">
+            <div class="form-group">
+                <label for="name">First Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter first name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="surname">Surname</label>
+                <input type="text" id="surname" name="surname" placeholder="Enter surname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Personal Email Address</label>
+                <input type="email" id="email" name="email" placeholder="e.g., namesurname@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">System Role</label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select user role</option>
+                    <option value="Cleanup Crew">Cleanup Crew</option>
+                    <option value="Administrator">Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Temporary Password</label>
+                <input type="text" value="password123" disabled style="background-color: #f1f3f5; color: #666;">
+                <div class="info-text">New users are automatically initialized with password123.</div>
+            </div>
+
+            <button type="submit" class="btn-submit">Register Account</button>
+        </form>
+    </div>
+
+    <!-- Popup Modal Overlay (Only renders when a duplicate email is entered) -->
+    {% if duplicate_error %}
+    <div id="duplicateModal" class="custom-modal-overlay">
+        <div class="custom-modal-card">
+            <div class="modal-title">
+                <h5>Notice</h5>
+            </div>
+            <div class="modal-message">
+                <p>Account already exists, please register a new account.</p>
+            </div>
+            <button type="button" id="modalOkBtn" class="btn-modal-ok">OK</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Link your external script file -->
+    <script src="{{ url_for('static', filename='js/adminAddUserScript.js') }}"></script>
+
+</body>
+</html>

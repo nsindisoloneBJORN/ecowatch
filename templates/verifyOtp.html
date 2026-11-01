@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Verify OTP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/indexStyle.css') }}">
+    
+    <style>
+        /* Registration Modal Overlay & Card Styling (Resident Success Popup) */
+        .registration-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .registration-modal-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            border-top: 5px solid #2e7d32;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .registration-modal-card .modal-icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .registration-modal-card h5 {
+            margin: 0 0 10px 0;
+            color: #212529;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .registration-modal-card p {
+            color: #555555;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 25px 0;
+        }
+
+        .registration-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-modal-report {
+            background-color: #2e7d32;
+            color: #ffffff !important;
+            padding: 11px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            transition: background 0.2s;
+        }
+
+        .btn-modal-report:hover {
+            background-color: #1b5e20;
+        }
+
+        .btn-modal-close {
+            background-color: transparent;
+            color: #666666;
+            border: 1px solid #cccccc;
+            padding: 9px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-close:hover {
+            background-color: #f5f5f5;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="/" class="logo">EcoWatch</a>
+            <span class="logo-sub">Community & Municipal Waste Management</span>
+        </div>
+    </header>
+
+    {% if show_registration_modal %}
+    <!-- Resident Registration & Verification Success Modal Popup -->
+    <div id="registrationModal" class="registration-modal-overlay">
+        <div class="registration-modal-card">
+            <div class="modal-icon-circle">✓</div>
+            <h5>Account Verified Successfully!</h5>
+            <p>Welcome to EcoWatch! Your account has been verified successfully. You can now proceed directly to report waste or close this window.</p>
+            <div class="registration-modal-actions">
+                <a href="{{ url_for('residentPortal') }}" class="btn-modal-report">Continue to Report Waste</a>
+                <button type="button" onclick="closeRegistrationModal()" class="btn-modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="main-wrapper">
+        <div class="login-form-box" style="margin: 40px auto; max-width: 400px; text-align: center;">
+            <h2>Enter Verification Code</h2>
+            <div class="login-subtitle" style="margin-bottom: 20px;">We've sent a 6-digit OTP to your email.</div>
+            
+            <form action="/verify-otp" method="POST" autocomplete="off">
+                <div class="form-group">
+                    <input type="text" name="otp" 
+                           placeholder="Enter 6-digit OTP" 
+                           maxlength="6" required style="text-align: center; font-size: 18px; letter-spacing: 4px;">
+                </div>
+                <button type="submit" class="btn-action btn-green" style="width: 100%; margin-top: 10px;">Verify Account</button>
+            </form>
+
+            <!-- Resend OTP Form -->
+            <form action="{{ url_for('resend_otp') }}" method="POST" style="margin-top: 15px; text-align: center;">
+                <button type="submit" style="background: none; border: none; color: #2e7d32; cursor: pointer; text-decoration: underline; font-size: 14px;">
+                    Didn't receive a code? Resend OTP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function closeRegistrationModal() {
+            const modal = document.getElementById('registrationModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

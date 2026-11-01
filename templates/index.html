@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWatch - Community & Municipal Waste Management</title>
+    <!-- Linked external stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/indexStyle.css') }}">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header>
+        <div class="logo-container">
+            <a href="#" class="logo" onclick="showHome()">EcoWatch</a>
+            <span class="logo-sub">Community & Municipal Waste Management</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a onclick="showHome()">Home</a></li>
+                <li><a onclick="openInfoModal()">About</a></li>
+                <li><a onclick="alert('Contact municipal admin at support@ecowatch.co.za')">Contact</a></li>
+                <li><a class="login-nav-btn" onclick="showLoginPage()">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-wrapper">
+
+        <!-- 1. HOME VIEW -->
+        <div id="home-hero">
+            <div class="digital-tag">Digital Solutions For Community Empowerment</div>
+            <h1 class="hero-title">Keep Our Community Clean</h1>
+            <p class="hero-desc">EcoWatch is a community and municipal waste management platform that allows residents to report overflowing communal skips and illegal dumping while helping municipal officials manage waste reports.</p>
+        </div>
+
+        <!-- 2. LOGIN VIEW -->
+        <div id="login-split-container" class="hidden">
+            <div class="login-form-box">
+                <h2>Welcome back</h2>
+                <div class="login-subtitle">Log in to your EcoWatch account</div>
+                
+                <form method="POST" autocomplete="off">
+                    <input type="text" name="fake_usernameremembered" style="display: none;" autocomplete="username">
+                    <input type="password" name="fake_passwordremembered" style="display: none;" autocomplete="new-password">
+
+                    <!-- Role Selector -->
+                    <div class="form-group">
+                        <label for="role">Select Role</label>
+                        <select id="role" name="role" onchange="updateRoleFields()">
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="Administrator">Administrator</option>
+                            <option value="Cleanup Crew">Clean-up Crew</option>
+                            <option value="Resident" selected>Resident</option>
+                        </select>
+                    </div>
+
+                    <!-- Identifier Field (Dynamic Label & Placeholder) -->
+                    <div class="form-group">
+                        <label for="identifier" id="identifier-label">Enter Your Email Or Number</label>
+                        <input type="text" id="identifier" name="contact_detail" placeholder="Enter Your Email Or Number" autocomplete="off" readonly onmousedown="this.removeAttribute('readonly');" required>
+                    </div>
+
+                    <!-- Password Field with View Toggle -->
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-wrapper" style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="password" name="password" placeholder="Enter Password" autocomplete="new-password" readonly onmousedown="this.removeAttribute('readonly');" required style="width: 100%; padding-right: 40px;">
+                            <i class="fa-solid fa-eye" id="togglePassword" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; cursor: pointer; color: #666;"></i>
+                        </div>
+                        
+                        <!-- Error Message Displayed Directly Below Password Box -->
+                        {% if error %}
+                            <div style="color: #dc3545; font-size: 0.85rem; margin-top: 6px; font-weight: 500;">
+                                {{ error }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn-action btn-green login-submit-btn" style="width: 100%; margin-top: 10px;">Log In</button>
+                </form>
+
+                <div class="switch-text" style="text-align: center; font-size: 13px; margin-top: 20px;">
+                    Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Auto-display login view if an error exists -->
+    {% if error %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const homeHero = document.getElementById('home-hero');
+            const loginContainer = document.getElementById('login-split-container');
+            if (homeHero) homeHero.style.display = 'none';
+            if (loginContainer) loginContainer.classList.remove('hidden');
+        });
+    </script>
+    {% endif %}
+
+    <!-- Linked external JavaScript file -->
+    <script src="{{ url_for('static', filename='js/indexScript.js') }}"></script>
+</body>
+</html>
